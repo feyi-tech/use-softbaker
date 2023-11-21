@@ -1,0 +1,40 @@
+{
+  "name": "paybulous-contract",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "cs": "truffle run contract-size",
+    "c": "truffle compile --all",
+    "cabi": "npm run c && node abi-broadcaster",
+    "d.test": "truffle migrate --network Testnet --compile-none",
+    "d.test.f": "npm run cabi && node del-abi & truffle migrate --network Testnet --reset --compile-none",
+    "d.live": "truffle migrate --network Bsc --compile-none",
+    "d.live.f": "npm run cabi && node del-abi & truffle migrate --network Bsc --reset --compile-none",
+    "d.eth": "truffle migrate --network Eth --compile-none",
+    "d.eth.f": "npm run cabi && node del-abi & truffle migrate --network Eth --reset --compile-none",
+    "flat": "truffle-flattener",
+    "verify.test": "npx truffle run verify WalletFactory Wallet --network Testnet",
+    "verify.live": "npx truffle run verify WalletFactory --network Bsc",
+    "verify.test.t": "npx truffle run verify Shilla --network Testnet",
+    "verify.test.v": "npx truffle run verify ShillaVault --network Testnet"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@chainlink/contracts": "^0.8.0",
+    "@ethersproject/bignumber": "^5.7.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "@truffle/hdwallet-provider": "^2.1.15",
+    "depcheck": "^1.4.7",
+    "dotenv": "^16.3.1",
+    "solhint": "^4.0.0",
+    "truffle-contract-size": "^2.0.1",
+    "truffle-flattener": "^1.6.0",
+    "truffle-plugin-verify": "^0.6.6",
+    "web3": "^4.2.2"
+  }
+}

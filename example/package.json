@@ -1,0 +1,27 @@
+{
+  "name": "test",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run open && next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "open": "start http://localhost:3000",
+    "lint": "next lint",
+    "link": "npm link ../"
+  },
+  "dependencies": {
+    "@chakra-ui/react": ">=2.4.9",
+    "@emotion/react": ">=11.10.5",
+    "@emotion/styled": ">=1.10.5",
+    "@types/node": "20.8.10",
+    "@types/react": "18.2.34",
+    "@types/react-dom": "18.2.14",
+    "next": "14.0.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "sweetalert2": "^11.9.0",
+    "typescript": "5.2.2",
+    "use-softbaker": "^1.0.7"
+  }
+}
