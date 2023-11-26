@@ -16,5 +16,5 @@ export interface AuthResource {
     auth: Auth | null | undefined,
     user?: User | null | undefined,
     authLoading?: boolean,
-    db: Firestore
+    db?: Firestore | null
 }

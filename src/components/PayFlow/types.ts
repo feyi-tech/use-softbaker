@@ -3,6 +3,31 @@ export interface Doc {
     [x: string]: any
 }
 
+export interface Tool {
+    id: string,
+    name: string,
+    isActive: boolean,
+    siteLogoUrl: string,
+    siteUrl: string,
+    desktopVideoUrl: string,
+    mobileVideoUrl: string,
+}
+export interface Vendor {
+    name: string,
+    number: string,
+    freq: number
+}
+export interface SdkConfig {
+    ttl_days: number,
+    valid_till: number,
+    min_deposit: number,
+    min_vendor_deposit: number,
+    parent_site_home: string,
+    contact_link: string,
+    tools: Tool[],
+    vendors: Vendor[]
+}
+
 export interface Coins {
     [x: string]: {
         coingecko_price_key: string,
@@ -28,7 +53,7 @@ export interface Coins {
 
 export interface UseBalanceUpdateResult {
     usdBalance: number,
-    syncConfirmedBalance: (uid: string, coinsInfo: {[x: string]: BigInt}) => void
+    syncConfirmedBalance: (coinsInfo: {[x: string]: BigInt}) => void
 }
 
 export interface BalanceDoc {

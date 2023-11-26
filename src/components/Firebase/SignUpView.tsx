@@ -85,7 +85,7 @@ const SignUpView: React.FC<SignUpView> = ({ onAuthDone }) => {
                 
               }
             })
-            .catch((e) => {//console.log("regErr:2", e)
+            .catch((e) => {
                 let msg
                 if(e.code == "auth/email-already-in-use") {
                   msg = "Email already in use. Please sign in."

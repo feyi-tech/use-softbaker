@@ -137,7 +137,6 @@ defaultLatlng?: {lat: number, lng: number} | undefined, geotype?: string,
 [x:string]: any
 }
 
-
 const InputBox: React.FC<InputBoxProps> & { TYPES: TYPES_PROPS } = ({
 title, name, type, locale, value, onChange, onFocus, onCheckInfo, onKeyDown,
 errorMessage, helperText, info, 
@@ -259,7 +258,6 @@ const handleInputCheck = (
           .then(() => {
             //If the input has changed after the check was done, check the new input
             if(!onValueIsLatest(checkedValue)) {
-              //console.log("ValueIsNotLatest:!!!", "checkedValue", checkedValue, "latestValue", getLatestValue())
               check()
 
             } else {
@@ -267,7 +265,6 @@ const handleInputCheck = (
             }
           })
           .catch(e => {
-            //console.log("checkInfo.check:error", e.message)
             setSearchActive(false)
           })
         }
@@ -395,7 +392,7 @@ return (
       :
       type == TYPES.password?
       <InputGroup>
-        {iconLeft? <InputLeftElement children={iconLeft} /> : null}
+        {iconLeft? <InputLeftElement cursor="pointer" children={iconLeft} /> : null}
         <Input onFocus={onFocus} disabled={disabled} ref={inputRef} 
           name={name} 
           type={showPassword? "text" : "password"} 
@@ -433,7 +430,7 @@ return (
           errorBorderColor='red.300' 
           isInvalid={!nullOrEmpty(errorMessage)} 
         />
-        <InputRightElement width="auto" px="0.2rem" children={
+        <InputRightElement width="auto" px="0.5rem" children={
           <HStack justifyContent="flex-start" alignItems="center" m="0px !important" p="0px !important">
             {iconRight}
             <Box cursor="pointer" onClick={() => {
@@ -452,7 +449,7 @@ return (
       :
       type == TYPES.number?
       <InputGroup>
-        <InputLeftElement width="auto" px="0.2rem" children={
+        <InputLeftElement width="auto" px="0.2rem" cursor="pointer" children={
           <HStack justifyContent="flex-start" alignItems="center">
             <Box cursor="pointer" onClick={decreaseNumber} 
             border={{base: "0px", md: "1px"}} 
@@ -501,7 +498,7 @@ return (
           isInvalid={!nullOrEmpty(errorMessage)} 
         />
         
-        <InputRightElement width="auto" px="0.2rem"
+        <InputRightElement width="auto" px="0.2rem" cursor="pointer"
           children={
           <HStack justifyContent="flex-start" alignItems="center" m="0px !important" p="0px !important">
             {iconRight}
@@ -582,7 +579,7 @@ return (
         </Textarea>
         {
           maxTextLimit?
-          <InputRightElement width="auto" height="100%" alignItems="flex-end" px="0.2rem" children={
+          <InputRightElement width="auto" height="100%" alignItems="flex-end" px="0.2rem" cursor="pointer" children={
             <HStack justifyContent="flex-start" alignItems="center" m="0px !important" p="0px !important">
               {iconRight}
               <Text as="div" opacity="0.4">
@@ -802,7 +799,7 @@ return (
       type == TYPES.price?
       <VStack w="100%" justifyContent="flex-start" alignItems="center">
         <InputGroup>
-          <InputLeftElement width="auto" px="0.2rem" children={
+          <InputLeftElement width="auto" px="0.2rem" cursor="pointer" children={
             <HStack justifyContent="flex-start" alignItems="center">
               <Box cursor="pointer" onClick={decreaseNumber} 
               border={{base: "0px", md: "1px"}} 
@@ -851,7 +848,7 @@ return (
             isInvalid={!nullOrEmpty(errorMessage)} 
           />
           
-          <InputRightElement width="auto" px="0.2rem"
+          <InputRightElement width="auto" px="0.2rem" cursor="pointer"
             children={
             <HStack justifyContent="flex-start" alignItems="center" m="0px !important" p="0px !important">
               {iconRight}

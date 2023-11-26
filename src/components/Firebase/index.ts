@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react'
 // Import the functions you need from the SDKs you need
 import { FirebaseApp, initializeApp } from "firebase/app";
 //Analytics for web
-import { Analytics, getAnalytics, setUserProperties } from "firebase/analytics";
+import { Analytics, getAnalytics } from "firebase/analytics";
 //Authentication for Web
-import { getAuth, onAuthStateChanged, reauthenticateWithCredential } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 //Cloud Firestore for Web
-import { doc, DocumentData, Firestore, getDoc, getFirestore, Timestamp } from "firebase/firestore";
-import { Auth, User, AuthResource } from './data.type';
+import {Firestore, getFirestore } from "firebase/firestore";
+import { Auth, User } from './data.type';
 import { FIREBASE_CONFIG } from '../../utils/c'
 
 const useFirebase = () => {
@@ -22,12 +22,15 @@ const useFirebase = () => {
         // Your web app's Firebase configuration
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         // Initialize Firebase
-        const theApp = initializeApp(FIREBASE_CONFIG)
-        setApp(theApp)
-        setAnalytics(getAnalytics(theApp))
+
+        const theApp = initializeApp(FIREBASE_CONFIG);
+        const theDb = getFirestore(theApp);
         const theAuth = getAuth(theApp)
-        setAuth(theAuth)
-        setDb(getFirestore(theApp));
+        const theAnalytics = getAnalytics(theApp);
+        setApp(theApp);
+        setDb(theDb);
+        setAuth(theAuth);
+        setAnalytics(theAnalytics);
 
         const unsubscribe = onAuthStateChanged(theAuth, (user) => {
             if (user) {

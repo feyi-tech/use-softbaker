@@ -22,6 +22,6 @@
     "react-dom": "18.2.0",
     "sweetalert2": "^11.9.0",
     "typescript": "5.2.2",
-    "use-softbaker": "^1.0.7"
+    "use-softbaker": "^1.0.8"
   }
 }

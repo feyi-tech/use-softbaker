@@ -1,36 +1,54 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Divider, Flex, HStack, Image, Tab, TabList, TabPanel, TabPanels, Tabs, Text, VStack } from "@chakra-ui/react"
-import { COINS, IS_TEST, LIGHT_THEME, LOGO_PATH, MIN_DEPOSIT, PRECISION, SDK_NAME, SDK_SITE } from '../../utils/c'
+import { COINS, IS_TEST, LIGHT_THEME, LOGO_PATH, PRECISION, SDK_NAME, SDK_SITE } from '../../utils/c'
 import PaymentDetected from './PaymentDetected'
-import { AllCoinsBalanceInfo, PriceData, SaltBalanceConfirmation } from './types'
-import { FaLock, FaTimes } from 'react-icons/fa'
+import { AllCoinsBalanceInfo, PriceData, SaltBalanceConfirmation, Vendor } from './types'
+import { FaEdit, FaLock, FaPen, FaTimes } from 'react-icons/fa'
 import useFirebase from '../Firebase'
 import CryptoDeposit from './CryptoDeposit'
 import FiatDeposit from './FiatDeposit'
 import { getDefaultCoin } from '../../utils/f'
 import { Theme } from '../../theme.type'
-import PleaseWaitForWallet from '../widgets/PleaseWaitForWallet'
+import PleaseWaitForX from '../widgets/PleaseWaitForX'
+import AmountEditor from './AmountEditor'
 
 
 export interface PayFlow {
+    show: boolean,
     payAmount: number | null | undefined,
     walletListenerResult: AllCoinsBalanceInfo,
     priceData: PriceData,
+    vendors?: Vendor[] | null,
+    minDeposit: number,
+    minVendorDeposit: number
     onSuccess: (latestDeposit: SaltBalanceConfirmation) => void,
     onClose: () => void,
     theme?: Theme
 }
 
-const PayFlow: React.FC<PayFlow> = ({ payAmount, walletListenerResult, priceData, onSuccess, onClose, theme }) => {
+const PayFlow: React.FC<PayFlow> = ({ show, payAmount, walletListenerResult, priceData, vendors, minDeposit, minVendorDeposit, onSuccess, onClose, theme }) => {
     const { user } = useFirebase()
     const [currentTheme, setCurrentTheme] = useState<Theme>(LIGHT_THEME)
     useEffect(() => {
         if(theme) setCurrentTheme(theme)
     }, [theme])
 
-    const [amount, setAmount] = useState<number>(payAmount || MIN_DEPOSIT)
+    const [amount, setAmount] = useState<number>(payAmount || 0)
+    const [minDepositLoaded, setMinDepositLoaded] = useState<boolean>(false)
     const [coin, setCoin] = useState<string>(getDefaultCoin())
     const [wallet, setWallet] = useState<string | null | undefined>(null)
+    const [editAmount, setEditAmount] = useState<boolean>(true)
+
+    useEffect(() => {
+        if(minDeposit > 0 && !minDepositLoaded) {
+            setMinDepositLoaded(true)
+            setAmount(!payAmount || payAmount < minDeposit? minDeposit : payAmount)
+        }
+    }, [minDeposit])
+
+    useEffect(() => {
+        console.log(`${SDK_NAME}:/PayFlow.amount: `, amount)
+    }, [amount])
     
 
     const { 
@@ -88,7 +106,7 @@ const PayFlow: React.FC<PayFlow> = ({ payAmount, walletListenerResult, priceData
     }, [latestDepositBnbTest, latestDepositBnb, latestDepositEth])
 
 
-    if(!payAmount) return null
+    if(!show) return null
     return (
         <Box
             position="fixed"
@@ -110,7 +128,7 @@ const PayFlow: React.FC<PayFlow> = ({ payAmount, walletListenerResult, priceData
                 pt={{base: "0.5rem", md: "0px"}} overflowY="auto" overflowX="hidden">
                   
                     <HStack w="100%" h="40px" px="0.5rem" justifyContent="flex-end" alignItems="center">
-                      <Box p="0.5rem" cursor="pointer" border="1px solid #e2e8f0" 
+                      <Box p="0.5rem" cursor="pointer" border="1px solid #e2e8f0" _hover={{opacity: 0.7}} 
                         borderRadius="50%" onClick={() => {
                             if(latestDeposit) {
                                 onSuccess(latestDeposit)
@@ -140,61 +158,79 @@ const PayFlow: React.FC<PayFlow> = ({ payAmount, walletListenerResult, priceData
                                 <Box fontSize="11px">{user.email}</Box>
                                 : null
                             }
-                            <Box fontSize="1rem" fontWeight="bold" color="green" mt="0px !important">
-                                ${amount.toFixed(2)}
-                            </Box>
+                            <HStack justifyContent="flex-start" alignItems="center" m="0px !important">
+                                <Box fontSize="1rem" fontWeight="bold" color="green" mt="0px !important">
+                                    ${amount.toFixed(2)}
+                                </Box>
+                                {
+                                    editAmount? null :
+                                    <Box p="0px" ml="5px !important" cursor="pointer" onClick={() => {
+                                        setEditAmount(true)
+                                    }}>
+                                        <FaPen />
+                                    </Box>
+                                }
+                            </HStack>
                         </VStack>
                     </Box>
                     <Divider mx="0px !important" mb={2} />
-                    <Tabs isFitted>
-                        <TabList>
-                            <Tab>Crypto</Tab>
-                            <Tab>Cash/Fiat</Tab>
-                        </TabList>
-                        {
-                            latestDeposit?
-                            <PaymentDetected amount={latestDeposit.depositedAmountInCoin} symbol={COINS[latestDeposit.coin].symbol} />
-                            :
-                            <TabPanels p="0px !important">
-                                <TabPanel p="0px !important" w="100%" h="68vh">
-                                <CryptoDeposit 
-                                    amount={amount}
-                                    setAmount={setAmount} 
-                                    coin={coin}
-                                    setCoin={setCoin}
-                                    wallet={wallet}
-                                    setWallet={setWallet}
-                                    walletListenerResult={walletListenerResult}
-                                />
-                                </TabPanel>
-                                <TabPanel p="0px !important" w="100%" h="68vh">
-                                    {
-                                        priceData[`${COINS.bnb.coingecko_price_key}_usd`]?
-                                        <FiatDeposit 
-                                            coinAmount={Number((amount / priceData[`${COINS.bnb.coingecko_price_key}_usd`]).toPrecision(PRECISION))}
-                                            coinSymbol={COINS.bnb.symbol}
-                                            wallet={IS_TEST? walletBnbTest : walletBnb}
-                                            usdAmount={amount}
-                                            fiatSymbol="NGN"
-                                            fiatName="Naira"
-                                            fiatLogo={<>&#8358;&nbsp;</>}
-                                        />
-                                        :
-                                        <PleaseWaitForWallet />
-                                    }
-                                </TabPanel>
-                            </TabPanels>
-                        }
-                    </Tabs>
+                    {
+                        minDeposit == 0 || minVendorDeposit == 0?
+                        <PleaseWaitForX />
+                        :
+                        editAmount?
+                        <AmountEditor amount={amount} minAmount={minDeposit} onAmountValid={(amount) => {
+                            setAmount(amount)
+                        }} onSubmit={() => {
+                            setEditAmount(false)
+                        }} />
+                        :
+                        <Tabs isFitted>
+                            <TabList>
+                                <Tab>Crypto</Tab>
+                                <Tab>Cash/Fiat</Tab>
+                            </TabList>
+                            {
+                                latestDeposit?
+                                <PaymentDetected amount={latestDeposit.depositedAmountInCoin} symbol={COINS[latestDeposit.coin].symbol} />
+                                :
+                                <TabPanels p="0px !important">
+                                    <TabPanel p="0px !important" w="100%" h="68vh">
+                                    <CryptoDeposit 
+                                        amount={amount}
+                                        coin={coin}
+                                        setCoin={setCoin}
+                                        coinSymbol={COINS[coin].symbol}
+                                        coinAmount={Number((amount / priceData[`${COINS[coin].coingecko_price_key}_usd`]).toPrecision(PRECISION))}
+                                        wallet={wallet}
+                                        setWallet={setWallet}
+                                        walletListenerResult={walletListenerResult}
+                                    />
+                                    </TabPanel>
+                                    <TabPanel p="0px !important" w="100%" h="68vh">
+                                        {
+                                            priceData[`${COINS.bnb.coingecko_price_key}_usd`]?
+                                            <FiatDeposit 
+                                                vendors={vendors}
+                                                minVendorCoinAmount={Number((minVendorDeposit / priceData[`${COINS.bnb.coingecko_price_key}_usd`]).toPrecision(PRECISION))}
+                                                minVendorUSDAmount={minVendorDeposit}
+                                                coinAmount={Number((amount / priceData[`${COINS.bnb.coingecko_price_key}_usd`]).toPrecision(PRECISION))}
+                                                coinSymbol={COINS.bnb.symbol}
+                                                wallet={IS_TEST? walletBnbTest : walletBnb}
+                                                usdAmount={amount}
+                                                fiatSymbol="NGN"
+                                                fiatName="Naira"
+                                                fiatLogo={<>&#8358;&nbsp;</>}
+                                            />
+                                            :
+                                            <PleaseWaitForX />
+                                        }
+                                    </TabPanel>
+                                </TabPanels>
+                            }
+                        </Tabs>
+                    }
                 </Box>
-                <Divider display={{base: "block", md: "none"}} />
-                <HStack 
-                  w="100%" maxW="400px" justifyContent="center" alignItems="center"
-                  bg={{base: "#fff", md: "transparent"}} 
-                  py="0.5rem">
-                    <Box><FaLock color="black" size="12px" /> </Box>
-                    <Text as="div" fontSize="12px" color={{base: "#555", md: "#fff"}}>Powered by <Text as="a" href={SDK_SITE} target="_blank" color="rgb(254,127,38)" opacity="0.7" fontWeight="bold">{SDK_NAME}</Text></Text>
-                </HStack>
             </Flex>
         </Box>
     );

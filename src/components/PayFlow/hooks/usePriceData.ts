@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { PriceData } from "../types"
 import axios from "axios"
 import { PRICE_FETCH_INTERVAL_MINS } from "../../../utils/c"
+import { consoleLog } from "../../../utils/f"
 
 const usePriceData = () => {
     const [priceData, setPriceData] = useState<PriceData>({})
@@ -26,13 +27,13 @@ const usePriceData = () => {
                 priceDataState[`${key}_usd`] = priceData.data[key].usd
             }
             setPriceData(priceDataState)
-            console.log("fetchPrice.data: ", priceDataState)
+            consoleLog("fetchPrice.data: ", priceDataState)
             setTimeout(() => {
                 fetchPrice()
             }, PRICE_FETCH_INTERVAL_MINS * 60 * 1000);
 
         } catch(e: any) {
-            console.log("fetchPrice.Error: ", e.message)
+            consoleLog("fetchPrice.Error: ", e.message)
             setTimeout(() => {
                 fetchPrice()
             }, 10000);

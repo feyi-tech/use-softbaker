@@ -1,1 +1,1 @@
-export { SoftBakerProvider, useSoftBaker } from "./SoftBakerProvider";
+export { SoftBakerProvider, useSoftBaker, LIGHT_THEME, DARK_THEME } from "./SoftBakerProvider";

@@ -1,4 +1,4 @@
-import { COINS } from "./c";
+import { COINS, STORAGE_KEYS } from "./c";
 
 const Decimal = require('decimal.js');
 
@@ -54,6 +54,30 @@ export const rejectPromise = (promiseId: string, error: any): void => {
         delete (window as any)[`${USE_SOFT_BAKER_RESOLVE_PREFIX}${promiseId}`]
         delete (window as any)[`${USE_SOFT_BAKER_REJECT_PREFIX}${promiseId}`]
     }
+}
+
+export const updateLogSettings = (enableLog?: boolean | null) => {
+    if(enableLog) {
+        localStorage.setItem(STORAGE_KEYS.ENABLED_LOG, "true")
+
+    } else {
+        localStorage.setItem(STORAGE_KEYS.ENABLED_LOG, "false")
+    }
+}
+export const consoleLog = (...args: any[]) => {
+  // Check if the environment is not Windows
+  if(typeof window === 'undefined') {
+    console.log(...args);
+    return
+  }
+
+  // Check if logging has been disabled
+  const isEnabled = localStorage.getItem(STORAGE_KEYS.ENABLED_LOG) === "true";
+
+  // If not disabled and not in a Windows environment, call the normal console.log
+  if (isEnabled) {
+    console.log(...args);
+  }
 }
 
 export const whatsappLink = (phoneNumber?: string | null, message?: string): string => {

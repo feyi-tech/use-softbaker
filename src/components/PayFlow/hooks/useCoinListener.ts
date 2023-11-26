@@ -1,7 +1,7 @@
 import React, { useEffect, useState }  from 'react'
 import { COINS, PRECISION, PROMISE_ID } from '../../../utils/c'
 import WalletFactory from '../WalletFactory'
-import { promiseResolvePending, resolvePromise, weiToEther } from '../../../utils/f';
+import { consoleLog, promiseResolvePending, resolvePromise, weiToEther } from '../../../utils/f';
 import { BalanceInfo, PriceData, SaltBalanceConfirmation } from '../types';
 import useFirebase from '../../Firebase';
 
@@ -46,7 +46,7 @@ const useCoinListener = (coin: string, decimals: number, requiredConfirmations: 
     const updateConfirmationsInfo = (confirmationsInfo: BalanceInfo) => {
 
         setConfirmationBalanceInfo(confirmationsInfo)
-        console.log("updateConfirmationsInfo: ", confirmationsInfo)
+        //consoleLog("updateConfirmationsInfo: ", confirmationsInfo)
     }
 
     useEffect(() => {
@@ -90,7 +90,7 @@ const useCoinListener = (coin: string, decimals: number, requiredConfirmations: 
             updateConfirmationsInfo(confirmationsInfo)
 
             factory.startBlockListener(async blockNumber => {
-                console.log("startBlockListener.blockNumber", blockNumber)
+                //consoleLog("startBlockListener.blockNumber", blockNumber)
                 if(user) {
                     try {
                         const confirmations = await getConfirmations(user.uid, blockNumber, requiredConfirmations, coinKey, factory)
@@ -98,7 +98,7 @@ const useCoinListener = (coin: string, decimals: number, requiredConfirmations: 
                         updateConfirmationsInfo(confirmationsInfo)
     
                     } catch(e: any) {
-                        console.log(`${TAG}/startBlockListener/error/ => ${e.message}`)
+                        //consoleLog(`${TAG}/startBlockListener/error/ => ${e.message}`)
                     }
 
                 } else {
@@ -108,7 +108,7 @@ const useCoinListener = (coin: string, decimals: number, requiredConfirmations: 
 
         })
         .catch(e => {
-            console.log(`${TAG}/e1/${coinKey} => ${e.message}`)
+            //consoleLog(`${TAG}/e1/${coinKey} => ${e.message}`)
             setTimeout(() => {
                 initCoin(uid, coinKey, factory);
             }, 5000);
@@ -120,7 +120,7 @@ const useCoinListener = (coin: string, decimals: number, requiredConfirmations: 
             const promises = []
             //Check the balance in each block, starting from the past blocks to the current block
             for(var i = currentBlock - confirmations; i <= currentBlock; i++) {
-                //console.log("i: ", i, confirmations - (currentBlock - i))
+                //consoleLog("i: ", i, confirmations - (currentBlock - i))
                 promises.push(new Promise(async (resolve, reject) => {
                     try {
                         const confirmation = await factory.getSaltBalance(uid, i)
@@ -131,19 +131,10 @@ const useCoinListener = (coin: string, decimals: number, requiredConfirmations: 
                             remainingConfirmations: confirmations - (currentBlock - (confirmation.blockNumber as number))
                         } as SaltBalanceConfirmation
                         
-                        /*
-                        if([7,8,9,40,55,56].includes(saltBalanceConfirmation.remainingConfirmations)) {
-                            saltBalanceConfirmation.balance = [
-                                BigInt("1000000000000000000"),
-                                BigInt("1000000000000000"),
-                                BigInt("10000000000000"),
-                            ][Math.floor(Math.random() * 3)]
-                        }*/
-                        
                         resolve(saltBalanceConfirmation)
         
                     } catch(e: any) {
-                        //console.log("Error: ", e.message)
+                        //consoleLog("Error: ", e.message)
                         resolve({})
                     }
         
@@ -198,7 +189,7 @@ const useCoinListener = (coin: string, decimals: number, requiredConfirmations: 
                     
                     if(coinPrice) {
                         newDeposit.depositedAmountInUsd = newDeposit.depositedAmountInCoin * coinPrice
-                        //console.log("fetchPrice.coinPrice", coinPrice, newDeposit.depositedAmountInUsd, newDeposit.depositedAmountInCoin)
+                        //consoleLog("fetchPrice.coinPrice", coinPrice, newDeposit.depositedAmountInUsd, newDeposit.depositedAmountInCoin)
                     }
 
                     if(index == confirmations.length - 1) {

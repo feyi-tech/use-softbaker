@@ -4,24 +4,24 @@ import {
 } from '@chakra-ui/react';
 import { QRCode } from 'react-qrcode-logo';
 import { FaCheckCircle, FaCopy, FaExclamationTriangle } from 'react-icons/fa';
-import { COINS, LOGO_PATH, MIN_DEPOSIT, MIN_DEPOSIT_ERROR } from '../../../utils/c';
+import { COINS, LOGO_PATH } from '../../../utils/c';
 import { AllCoinsBalanceInfo } from '../types';
-import PleaseWaitForWallet from '../../widgets/PleaseWaitForWallet';
+import PleaseWaitForX from '../../widgets/PleaseWaitForX';
 
 
 interface CryptoDeposit {
-    amount: number, setAmount: (amount: number) => void, 
+    amount: number, 
     coin: string, setCoin: (coin: string) => void, 
+    coinAmount: number, coinSymbol: string,
     wallet: string | null | undefined, setWallet: (wallet: string | null | undefined) => void,
     walletListenerResult: AllCoinsBalanceInfo, 
     [x: string]: any
 }
 const CryptoDeposit: React.FC<CryptoDeposit> = ({ 
-    amount, setAmount, coin, setCoin, 
+    amount, coin, setCoin, coinAmount, coinSymbol,
     wallet, setWallet,
     walletListenerResult, ...props 
 }) => {
-    const [amountError, setAmountError] = useState<string>()
     const [copySuccess, setCopySuccess] = useState(false);
 
     const handleCopy = () => {
@@ -73,20 +73,6 @@ const CryptoDeposit: React.FC<CryptoDeposit> = ({
         balanceInUsd, balancePendingInUsd,
     } = walletListenerResult
 
-    const submitAmount = (amount: number) => {
-        setAmountError("")
-        if(!amount || isNaN(amount)) {
-            setAmountError("Please enter an amount")
-
-        } else if(amount < MIN_DEPOSIT) {
-            setAmount(amount)
-            setAmountError(MIN_DEPOSIT_ERROR)
-
-        } else {
-            setAmount(amount)
-        }
-    }
-
     useEffect(() => {
         if(coin) {
             if(coin == COINS.bnb_testnet.key) {
@@ -107,7 +93,7 @@ const CryptoDeposit: React.FC<CryptoDeposit> = ({
         <Box px={{base: "8px", md: "32px"}} minH="250px" {...props}>
             <Flex direction="column" alignItems="center" justifyContent="center">
                 <Text mb={1} textAlign="center" fontSize="14px">Scan the QR code or copy the wallet address to deposit:</Text>
-                <Box mb={2}>
+                <Box mb={1}>
                     <Box pos="relative" display="inline-block" p="0px" bg="#fff" borderRadius="10px">
                     {
                         wallet?
@@ -123,10 +109,14 @@ const CryptoDeposit: React.FC<CryptoDeposit> = ({
                             removeQrCodeBehindLogo={true}
                         />
                         :
-                        <PleaseWaitForWallet />
+                        <PleaseWaitForX />
                     }
                     </Box>
                 </Box>
+
+                <HStack w="100%" justifyContent="center" alignItems="center" mb={1}>
+                    <Text p="0px" fontWeight="14px" textAlign="center">To deposit <b>${amount.toFixed(2)}</b>, transfer <b>{coinAmount} {coinSymbol}</b> to the wallet address.</Text>
+                </HStack>
                 
                 <>
                 {
@@ -150,7 +140,7 @@ const CryptoDeposit: React.FC<CryptoDeposit> = ({
 
                 <Box pos="relative" mb={2} w="100%">
                     <Text as="label" htmlFor="select-coin" w="100%" fontSize="10px">
-                        Select Coin
+                        Select a Coin(BNN or ETH)
                     </Text>
                     <Select bg="#f9f9f9" id="select-coin" cursor="pointer" onChange={(c: any) => {
                         setCoin(c.target.value)

@@ -8,6 +8,7 @@ import babel from '@rollup/plugin-babel';
 import replace from '@rollup/plugin-replace';
 import globals from 'rollup-plugin-node-globals';
 import builtins from 'rollup-plugin-node-builtins';
+import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 
 const packageJson = require("./package.json");
 
@@ -29,6 +30,9 @@ export default [
       },
     ],
     plugins: [
+      peerDepsExternal({
+        includeDependencies: true,
+      }),
       resolve({ preferBuiltins: false, mainFields: ['browser'] }),
       commonjs({ extensions: ['.js', '.ts', '.tsx'] }),
       typescript({ tsconfig: "./tsconfig.json", sourceMap: false }),
@@ -47,7 +51,7 @@ export default [
       globals(),
       builtins()
     ],
-    external: ["react", "react-dom", "@chakra-ui/react"],
+    //external: ["react", "react-dom", "@chakra-ui/react", "firebase", "@firebase"],
     onwarn: function(warning, handler) {
       // Skip certain warnings
       

@@ -1,12 +1,11 @@
 import { Coins } from "../components/PayFlow/types";
-import { LIB_LOGO, BNB_LOGO, ETH_LOGO } from "./base64Images"
+import { LIB_LOGO, BNB_LOGO, ETH_LOGO,  } from "./base64Images"
 
 import WalletFactoryTestnet from '../abis/WalletFactoryTestnet.json'
 import WalletFactoryBsc from '../abis/WalletFactoryBsc.json'
 import WalletFactoryEth from '../abis/WalletFactoryEth.json'
 import WalletFactoryGoerli from '../abis/WalletFactoryGoerli.json'
 import { Theme } from "../theme.type";
-
 
 export const FIREBASE_CONFIG: {[x: string]: any} = {
     apiKey: "AIzaSyBykIOPWfKmDrAC6jly4p1Hl_NsaRSntFo",
@@ -43,6 +42,7 @@ export const DARK_THEME: Theme = {
     },
 }
 
+
 export const PROMISE_ID = {
     signIn: "signIn",
     getAccessToken: "getAccessToken",
@@ -53,7 +53,8 @@ export const IS_TEST = true
 export const SERVER_BASE_URL_TEST = "https://server.softbaker.com"//"http://localhost:3001"
 export const SERVER_BASE_URL_LIVE = "https://server.softbaker.com"
 export const PRECISION = 5
-export const PRICE_FETCH_INTERVAL_MINS = 5
+export const SDK_RETRY_INTERVAL_MINS = 0.2
+export const PRICE_FETCH_INTERVAL_MINS = 10
 export const COINS: Coins = {
     bnb_testnet: {
         coingecko_price_key: "binancecoin",
@@ -114,25 +115,11 @@ export const COINS: Coins = {
 }
 
 
-export const MIN_DEPOSIT = 5
-export const MIN_DEPOSIT_ERROR = "Your deposit cannot be less than $5."
 export const SDK_NAME = "SoftbakerPay"
 export const SDK_SITE = "https://softbaker.com"
+
+export const STORAGE_KEYS = {
+    ENABLED_LOG: `${SDK_NAME}_ENABLED_LOG`,
+    SDK_CONFIG: `${SDK_NAME}_SDK_CONFIG`
+}
 export const LOGO_PATH = LIB_LOGO
-export const CRYPTO_VENDORS = [
-    {
-        name: "Vendor 1",
-        phone: "+2349024564270",
-        freq: 1,
-    },
-    {
-        name: "Vendor 2",
-        phone: "+3349024564270",
-        freq: 2,
-    },
-    {
-        name: "Vendor 3",
-        phone: "+4349024564270",
-        freq: 3,
-    }
-]

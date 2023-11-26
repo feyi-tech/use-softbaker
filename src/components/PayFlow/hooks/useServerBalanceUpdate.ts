@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react"
 import { Balance, BalanceDoc, UseBalanceUpdateResult } from "../types"
 import useFirebase from "../../Firebase"
-import { doc, updateDoc, onSnapshot, collection } from "firebase/firestore"
+import { doc, onSnapshot, collection } from "firebase/firestore"
 import axios from "axios"
 import { IS_TEST, SERVER_BASE_URL_LIVE, SERVER_BASE_URL_TEST } from "../../../utils/c"
+import { consoleLog } from "../../../utils/f"
 
 interface CustomWindow extends Window {
     unsubscribeBalance?: () => void;
 }
-const customWindow = window as CustomWindow;
+const customWindow = typeof window !== 'undefined' ? (window as CustomWindow) : null;
 
 const useServerBalanceUpdate = (): UseBalanceUpdateResult => {
     const { user, db } = useFirebase()
@@ -28,7 +29,7 @@ const useServerBalanceUpdate = (): UseBalanceUpdateResult => {
     }
 
     const [updatingCoins, setUpdatingCoins] = useState<string[]>([])
-    const syncConfirmedBalance = (uid: string, coinsInfo: {[x: string]: BigInt}) => {
+    const syncConfirmedBalance = (coinsInfo: {[x: string]: BigInt}) => {
         const coins = []
         const updating = []
         
@@ -42,7 +43,7 @@ const useServerBalanceUpdate = (): UseBalanceUpdateResult => {
             //Keep track of the coins being synced with the values being synced tp avoid multiple sync request
             setUpdatingCoins(updating)
             //Send sync request for the coins that needs syncing
-            updateBalanceDoc(uid, coins)
+            updateBalanceDoc(coins)
             .catch(e => {
                 //errorCoins contain the coins that failed during balance update
                 var errorCoins = e?.response?.data?.errorCoins
@@ -69,7 +70,7 @@ const useServerBalanceUpdate = (): UseBalanceUpdateResult => {
         }
     }
 
-    const updateBalanceDoc = (uid: string, coins: string[]) => {
+    const updateBalanceDoc = (coins: string[]) => {
         return new Promise((resolve, reject) => {
             if(!user) {
                 reject({error: "No User"})
@@ -85,11 +86,11 @@ const useServerBalanceUpdate = (): UseBalanceUpdateResult => {
                       },
                     })
                     .then(result => {
-                        console.log("updateBalanceDoc:result ", result)
+                        consoleLog("updateBalanceDoc:result ", result)
                         resolve(null)
                     })
                     .catch((error: Error) => {
-                        console.log("updateBalanceDoc:error ", error)
+                        consoleLog("updateBalanceDoc:error ", error)
                         reject(error)
                     })
                 });
@@ -101,26 +102,27 @@ const useServerBalanceUpdate = (): UseBalanceUpdateResult => {
         if (!user || !db) {
             setBalanceDoc({
                 usd_balance: 0
-            })
-            if(customWindow.unsubscribeBalance) {
+            });
+            if (customWindow && customWindow.unsubscribeBalance) {
                 try {
-                    customWindow.unsubscribeBalance()
-    
-                } catch(e) {}
+                    customWindow.unsubscribeBalance();
+                } catch (e) {}
             }
-            return
+            return;
         }
 
         const unsubscribe = onSnapshot(doc(collection(db, "wallets"), user.uid), (snapshot) => {
             if (snapshot.exists()) {
-                const data = snapshot.data() as BalanceDoc
-                setBalanceDoc(data)
+                const data = snapshot.data() as BalanceDoc;
+                setBalanceDoc(data);
             }
-        })
+        });
 
-        customWindow.unsubscribeBalance = unsubscribe;
+        if (customWindow) {
+            customWindow.unsubscribeBalance = unsubscribe;
+        }
 
-        return () => unsubscribe()
+        return () => unsubscribe();
     }, [user, db])
 
     return {
